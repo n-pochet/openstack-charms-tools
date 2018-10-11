@@ -243,17 +243,16 @@ class Status(dict):
 # units of a given service are upgraded at the same time).
 
 SERVICES = [
-    # Identity and Image
+    # Identity
     'keystone',
-    'glance',
 
-    # Upgrade nova
-    'nova-cloud-controller',
-    'nova-compute',
+    # Ceph
+    'ceph-mon',
+    'ceph-osd',
+    'ceph-radosgw',
 
     # Neutron upgrades
     'neutron-api',
-    'neutron-gateway',
 
     # Backend block-storage upgrade.
     # Note: just upgrade cinder service.
@@ -261,6 +260,22 @@ SERVICES = [
 
     # Upgrade dashboard
     'openstack-dashboard',
+
+    # Image
+    'glance',
+
+    # Upgrade other services
+    'aodh',
+    'gnocchi',
+    'ceilometer',
+    'heat',
+
+    # Upgrade nova
+    'nova-cloud-controller',
+    'nova-compute-kvm',
+    'nova-compute-kvm-dpdk',
+    # 'nova-compute-kvm-sriov',
+
 ]
 
 # Not all charms use the openstack-origin. The openstack specific
@@ -359,7 +374,7 @@ def perform_rolling_upgrade(service):
         # allow the user to manually intervene with the underlying cloud.
         # In the future, it would be nice to provide a mechanism to allow
         # the script to evacuate the node automatically (if desired).
-        if args.evacuate and service.name == 'nova-compute':
+        if args.evacuate and 'nova-compute' in service.name:
             six.moves.input('Preparing to upgrade %s. Perform any additional '
                             'admin actions desired. Press ENTER to proceed.' %
                             unit.name)
